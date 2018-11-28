@@ -13,3 +13,8 @@ stataexe="C:/VApps/Stata_SE/15/StataSE-64.exe"
 knitr::opts_chunk$set(engine.path=stataexe,comment="")
 #knitr::opts_chunk$set(echo = TRUE)
 ```
+
+path for stata
+sysdir
+to find path
+py_config()
