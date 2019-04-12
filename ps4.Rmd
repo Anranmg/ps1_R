@@ -1,0 +1,40 @@
+---
+title: "Stats 506, F18, Problem Set 4"
+author: "Anran Meng, anmeng@umich.edu"
+date: "2018/12/9"
+output: pdf_document
+---
+
+## Question 1
+
+
+```{r setup, echo=F, message=FALSE}
+source('ps4_q1.R')
+knitr::kable(data,col.names =c('Player','Debut','Country of Birth','Hits'),
+             caption = 'Question 1')
+```
+
+## Question 2
+
+Results of simulation are as following:
+
+```{r 2a, echo=FALSE}
+source('ps4_q2a.R')
+knitr::kable(results_q4a,digits = 3,caption = 'results in Question 2 (a)')
+load('results_q4b.RData')
+knitr::kable(results_q4b,digits = 3,caption = 'results in Question 2 (b)')
+```
+
+
+## Question 3
+```{r q3, echo=FALSE, message=FALSE}
+library(data.table)
+library(dplyr)
+data=fread('ps4_q3c.csv')
+gather(data,key=type,value=maxmum,-HCPCS_CODE,-HCPCS_DESCRIPTION)[c(1,3,6),]%>%
+  knitr::kable(digits = 3,caption='results in Question 3 (c)')
+data=fread('ps4_q3d.csv')
+gather(data,key=type,value=maxmum,-code,-description)[c(1,3,6),]%>%
+  knitr::kable(digits = 3,caption='results in Question 3 (d)')
+```
+
