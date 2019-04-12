@@ -1,0 +1,160 @@
+---
+title: "Stats 506, F18, Problem Set 1"
+author: "Anran Meng, anmeng@umich.edu"
+date: "2018/10/1"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+## Question 1
+### Part A
+```{sh,echo=FALSE}
+# !/bin/bash
+#part a
+# How many rows are there for region 3 in the RECS 2015 data set?
+cat recs2015_public_v3.csv | awk -F, '{print $2}'| grep 3 | wc -l
+#method2
+cat recs2015_public_v3.csv | cut -d "," -f 2 | grep 3 | wc -l
+
+#data set containing only: DOEID, NWEIGHT, and BRRWT1-BRRWT96.
+cut -d "," -f 1,475-571 recs2015_public_v3.csv> subset.csv
+```
+
+### Part B
+```{sh,echo=FALSE}
+#part 2
+#loop to count and print number of observations within each region.
+for d in 1 2 3 4
+do
+ echo $d
+ cut -d "," -f 2 recs2015_public_v3.csv | grep $d | wc -l
+done
+
+#file region_division.txt (sorted list unique combi REGIONC,DIVISION
+cut -d "," -f 2-3 recs2015_public_v3.csv| sort | uniq -d -u> region_division.txt
+```
+\pagebreak
+
+## Question 2
+###Question 2 a.
+Which airlines were responsible for at least 1% of the flights
+
+```{r q2a, echo=FALSE}
+library(knitr)
+source('ps1_q2.R')
+kable(select(al_1pct_13,name,pct13), digits=2, 
+      col.names=c("airline","pecent(%)"),caption='Proprtion of Flights by Airlines Over 1%.')
+```
+
+
+###Question 2 b.
+number and percent of annual flights in the first 10 months of 2013 and the first 10 months of 2014: 
+
+```{r q2b, echo=FALSE}
+kable(select(al_1pct_13_14,name,num13,prop13,lwr13,upr13), digits=2, 
+      col.names = c("Airline","Number","Pecent(%)","Lower bound(%)","Upper bound(%)"),
+      caption='Number and Percent of Annual Flights (%) in First 10 Months, 2013.')  
+kable(select(al_1pct_13_14,name,num14,prop14,lwr14,upr14), digits=2, 
+      col.names = c("Airline","Number","Pecent(%)","Lower bound(%)","Upper bound(%)"),
+      caption='Number and Percent of Annual Flights (%) in First 10 Months, 2014.')  
+kable(select(al_1pct_13_14,name,change,lwr_change, upr_change), digits=2, 
+      col.names = c("Airline","Pecent Change(%)","Lower bound(%)","Upper bound(%)"),
+      caption='Percent Change of Annual Flights (%) in First 10 Months, 2013-2014.')  
+
+```
+
+Which airlines showed the largest increase and decrease?
+
+largest increase: Delta Air Lines Inc.
+largest decrease: Endeavor Air Inc.
+
+Why do some airlines show an increase in the percent of flights but a decrease in the number of flights?
+
+It is due to change in the total yearly amount of flights. As total number of flights in
+2014 declined from 279384 to 251809, percent would rise with drop in number for airlines.   
+
+
+###Question 2 c.
+Among of the three NYC airports
+```{r q2c, echo=FALSE}
+kable(select(al_pct,origin,name,pct), digits=2, 
+      col.names = c("Airport","Airline","Pecent(%)"),
+      caption='Proprtion of Flights (%) by Airlines at Each NYC Airports.')
+kable(al_pct_pa, digits=2, 
+      col.names = c("Airport","Airline","Pecent(%)","Lower bound(%)","Upper bound(%)"),
+      caption='Proprtion of Flights (%) by Airlines in Part A.')
+```
+
+Which airline is the largest carrier at each airport?
+
+```{r q2c-largest, echo=FALSE}
+kable(al_pct_max, digits=2, 
+      col.names = c("Airport","Airline","Pecent(%)"),
+      caption='Largest Carrier at Each Airport.')
+```
+
+\pagebreak
+
+
+##Question3
+###Question 3 a
+```{r question3,echo=FALSE}
+source('ps1_q3.R')
+#produce a table-----------------------------------------------------
+knitr::kable(pct_stucco, digits=2, 
+             col.names = c("Division","Pecent(%)","Std_error","Lower bound(%)","Upper bound(%)"),
+             caption='Percent of Homes in Stucco Construction within Each Division.')
+
+#produce a scatter plot-----------------------------------------------------
+ggplot()+
+  geom_point(data=pct_stucco,aes(x=factor(DIVISION),y=pct))+
+  #geom_errorbar(data=pct_stucco,
+  #             aes(x=factor(DIVISION),pct,ymin=lwr,ymax=upr),
+  #            color="red",width=0.2)+
+  labs(x="Division",y="Percent",
+       title = "Scatter Plot of Stucco Percent within Each Division")
+```
+
+Which division has the highest proportion? Which the lowest?
+
+highest proportion: division 9, 
+lowest proportion: divison 6
+
+###Question 3 b
+Average total electricity usage in kilowatt hours in each division
+```{r q3b1,echo=FALSE}
+#produce a table-----------------------------------------------------
+knitr::kable(avg_e, digits=2, 
+              col.names = c("Division","Average","Std_error","Lower bound","Upper bound"),
+             caption='Average Total Electricity Usage within Each Division.')
+```
+
+```{r q3b2,echo=FALSE}
+#produce a table-----------------------------------------------------
+knitr::kable(avg_e_type, digits=2, 
+             col.names = c("Division","Type","Average","Std_error","Lower bound","Upper bound"),
+             caption='Average Total Electricity Usage (Urban/Rural) within Each Division.')
+
+#produce a plot-----------------------------------------------------
+ggplot(data=avg_e_type, aes(x=factor(DIVISION), y=avg_elec, fill=TYPE)) +
+  geom_bar(stat="identity", color="black", position=position_dodge())+
+  theme_minimal() + scale_fill_manual(values=c('#999999','#E69F00'))+
+  labs(x="Division",y="Average",
+       title = "Average Total Electricity Usage within Each Division")
+```
+
+###Question 3 c
+```{r q3c,echo=FALSE}
+#produce a table-----------------------------------------------------
+knitr::kable(prop_inte_diff, digits=2, 
+             col.names = c("Division","Prop. Disparity(%)","Std_error","Lower bound(%)","Upper bound(%)"),
+             caption='Proportion of Homes with Internet Access within Each Division.')
+```
+
+Which division has the largest disparity between urban and rural areas in terms of the proportion of homes with internet access?
+
+division 9
+
